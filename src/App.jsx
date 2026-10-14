@@ -1,6 +1,5 @@
 
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+
 import pokemon from './assets/pokemon.png'
 import './App.css'
 import { useState } from 'react'
@@ -9,9 +8,14 @@ async function getPokemon (){
   const url = "https://pokeapi.co/api/v2/pokemon?limit=151";
   try {
     const resultPokemon = await fetch(url)
-    console.log(resultPokemon)
+    if(!resultPokemon.ok){
+      throw new Error(`Erreur HTTP voici le code : ${resultPokemon.status}`)
+    }
+    const data = await resultPokemon.json()
+    console.log(JSON.stringify(data))
+    return data
   } catch (erreur) {
-    console.eroor(erreur.message)
+    console.error("Erreur lors de la requete", erreur)
   }
 }
 
@@ -19,8 +23,16 @@ async function getPokemon (){
 
 
 function App() {
+  console.log("entrée function app")
   const [namePokemon,setNamePokemon] = useState("pikachu")
 
+  const arrayPokemon = getPokemon
+
+
+
+  function handleChange(e){
+    setNamePokemon(e.target.value);
+  }
   return (
     <>
       <section id="center">
@@ -31,13 +43,18 @@ function App() {
         </div>
         <div>
           <h1>Trouver un pokemon</h1>
-          <label> Nom pokemon
-            <input type="text" name="namePokemon" value="{namePokemon}"/>
+          <label> Nom pokemon {namePokemon}
+            <input 
+            type="text" 
+            name="namePokemon" 
+            value={namePokemon}
+            onChange={handleChange}/>
           </label>
          
         </div>
-        <button onClick={()=>setNamePokemon()}>button  
+        <button >button  
         </button>
+        {arrayPokemon.maps((pokemon)=><p>{pokemon.name}</p>)}
       </section>
     </>
   )
